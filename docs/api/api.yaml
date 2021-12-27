@@ -1,0 +1,190 @@
+openapi: "3.0.0"
+info:
+  title: "Wutsi QR API"
+  description: |
+    API for generating QR Code tokens.
+
+    This API uses the [JWT](https://www.jwt.io) format for representing tokens.
+
+    It's a string in the format `xxxx.yyyy.zzzz`, componsed of 3 parts:
+    - The header: This is the `xxxx` part. It's a based 64 representation of the JSON containing the information about encryption algorigtm.
+    - The payload: This is the `yyyy` part. The payload contains the representation of the entity encoded.
+    - The signature: This is the `zzzz` part. The digital signature of the token, to verify the authenticity of the token
+
+  version: "1.0.0"
+
+servers:
+  - url: https://wutsi-qr-server-test.herokuapp.com
+    description: Sandbox
+  - url: https://wutsi-qr-server-prod.herokuapp.com
+    description: Production
+
+paths:
+  /v1/account:
+    post:
+      operationId: "account"
+      description: |
+        Create a QR code token for the current user.
+        - The Header contains the following fields:
+          - `alg`: Encryption algorith used
+          - `kid`: ID of the encryption key used for signing the token
+
+        - The payload contains the following fields:
+          - `sub`: The subject - which represent the ID of the merchant
+          - `iat`: Time when the token was issued
+          - `name`: The name of the user
+          - `picture`: URL of the user's picture
+          - 'tenant_id': ID of the tenant
+          - `entity_type`: Type of token. Must be `ACCOUNT`
+
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAccountQRCodeResponse'
+      tags:
+        - QR
+      security:
+        - api_key: [ 'qr-manage' ]
+
+  /v1/payment:
+    post:
+      operationId: "payment"
+      description: |
+        Create a QR code token for a payment request.
+        - The Header contains the following fields:
+          - `alg`: Encryption algorith used
+          - `kid`: ID of the encryption key used for signing the token
+
+        - The payload contains the following fields:
+          - `sub`: The subject - which represent the ID of the merchant
+          - `iat`: Time when the token was issued
+          - `exp`: The expiration time of the token. If a payment is performed after this time, it should fails
+          - `amount`: The amount of the payment
+          - `currency`: The currency of the payment
+          - `invoice_id`: ID of the invoice associate with the payment
+          - `reference_id`: Reference ID
+          - `description`: Description of the payment (max: 10 characters)
+          - 'tenant_id': ID of the tenant
+          - `entity_type`: Type of token. Must be `PAYMENT`
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentQRCodeRequest'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePaymentQRCodeResponse'
+      tags:
+        - QR
+      security:
+        - api_key: [ 'qr-manage' ]
+
+
+  /v1/keys/{id}:
+    get:
+      operationId: "get-key"
+      description: |
+        Return the current security key used to signing the QR codes
+      parameters:
+        - in: path
+          name: id
+          description: ID of the key
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetKeyResponse'
+      security:
+        - api_key: [ 'qr-read' ]
+
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      in: header
+      name: Authorization
+
+  schemas:
+    CreatePaymentQRCodeRequest:
+      type: object
+      properties:
+        referenceId:
+          type: string
+          format: uuid
+          description: Unique identifier of the request
+        merchantId:
+          type: integer
+          format: int64
+          description: Merchant Account ID
+        amount:
+          type: number
+          format: double
+          description: Amount of the order
+          minimum: 0
+        currency:
+          type: string
+          description: 3 letter currency code
+          maxLength: 3
+        description:
+          type: string
+          description: Description of the payment
+          nullable: true
+        invoiceId:
+          type: string
+          description: ID of the invoice
+          nullable: true
+        timeToLive:
+          type: integer
+          description: Time-To-Live of the QR code
+          nullable: true
+      required:
+        - currency
+        - referenceId
+
+    CreatePaymentQRCodeResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: QR Code Token
+
+
+    CreateAccountQRCodeResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: QR Code Token
+
+    GetKeyResponse:
+      type: object
+      properties:
+        key:
+          type: object
+          $ref: "#/components/schemas/Key"
+
+    Key:
+      type: object
+      properties:
+        algorithm:
+          type: string
+          description: Name of the security algorithm
+        content:
+          type: string
+          description: Content of the key, based-64 encoded
+
