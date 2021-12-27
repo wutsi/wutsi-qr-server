@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.web.client.HttpClientErrorException
-import kotlin.Int
 import kotlin.test.assertEquals
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -43,7 +42,7 @@ public class GetKeyControllerTest : AbstractSecuredController() {
     }
 
     @Test
-    public fun invalidTenat() {
+    public fun invalidTenant() {
         val url = "http://localhost:$port/v1/keys/800"
         val ex = assertThrows<HttpClientErrorException> {
             rest.getForEntity(url, ErrorResponse::class.java)

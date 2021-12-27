@@ -5,7 +5,6 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.wutsi.platform.qr.dto.CreatePaymentQRCodeRequest
 import com.wutsi.platform.qr.dto.CreatePaymentQRCodeResponse
 import com.wutsi.platform.qr.service.RSAKeyProviderImpl
-import com.wutsi.platform.qr.service.SecurityManager
 import com.wutsi.platform.qr.service.TenantProvider
 import org.springframework.stereotype.Service
 import java.util.Date
@@ -35,7 +34,7 @@ public class PaymentDelegate(
             builder.withClaim("description", request.description)
 
         if (request.timeToLive != null)
-            builder.withExpiresAt(Date(now + 1000*request.timeToLive))
+            builder.withExpiresAt(Date(now + 1000 * request.timeToLive))
 
         return CreatePaymentQRCodeResponse(
             token = builder.sign(Algorithm.RSA256(keyProvider)),
