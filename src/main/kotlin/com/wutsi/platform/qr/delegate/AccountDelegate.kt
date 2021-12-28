@@ -25,12 +25,8 @@ public class AccountDelegate(
             .withSubject(id.toString())
             .withIssuedAt(Date(System.currentTimeMillis()))
             .withJWTId(keyProvider.privateKeyId)
-            .withClaim("name", account.displayName)
             .withClaim("tenant_id", tenantProvider.id())
             .withClaim("entity_type", "ACCOUNT")
-
-        if (!account.pictureUrl.isNullOrBlank())
-            builder.withClaim("picture", account.pictureUrl)
 
         return CreateAccountQRCodeResponse(
             token = builder.sign(Algorithm.RSA256(keyProvider)),

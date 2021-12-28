@@ -19,8 +19,8 @@
   </parent>
 
   <properties>
-    <jacoco.threshold.line>0.90</jacoco.threshold.line>
-    <jacoco.threshold.class>0.90</jacoco.threshold.class>
+    <jacoco.threshold.line>0.91</jacoco.threshold.line>
+    <jacoco.threshold.class>0.94</jacoco.threshold.class>
     <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
     <jdk.version>11</jdk.version>
 
@@ -275,7 +275,8 @@
             <phase>validate</phase>
             <configuration>
               <target name="ktlint">
-                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true" classname="com.pinterest.ktlint.Main"
+                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
+                      classname="com.pinterest.ktlint.Main"
                       classpathref="maven.plugin.classpath">
                   <arg value="src/**/*.kt"/>
                   <!-- to generate report in checkstyle format prepend following args: -->

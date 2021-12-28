@@ -32,8 +32,6 @@ paths:
         - The payload contains the following fields:
           - `sub`: The subject - which represent the ID of the merchant
           - `iat`: Time when the token was issued
-          - `name`: The name of the user
-          - `picture`: URL of the user's picture
           - 'tenant_id': ID of the tenant
           - `entity_type`: Type of token. Must be `ACCOUNT`
 
@@ -66,7 +64,7 @@ paths:
           - `currency`: The currency of the payment
           - `invoice_id`: ID of the invoice associate with the payment
           - `reference_id`: Reference ID
-          - `description`: Description of the payment (max: 10 characters)
+          - `description`: Description of the payment (max: 100 characters)
           - 'tenant_id': ID of the tenant
           - `entity_type`: Type of token. Must be `PAYMENT`
 
