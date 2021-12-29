@@ -17,14 +17,21 @@ public class AccountDelegate(
     private val accountApi: WutsiAccountApi,
     private val tenantProvider: TenantProvider
 ) {
+    companion object {
+        const val TTL = 300 // 300 seconds
+    }
+
     public fun invoke(): CreateAccountQRCodeResponse {
+        val now = System.currentTimeMillis()
         val id = securityManager.currentUserId()
         val account = accountApi.getAccount(id).account
 
         val builder = JWT.create()
             .withSubject(id.toString())
-            .withIssuedAt(Date(System.currentTimeMillis()))
+            .withIssuedAt(Date(now))
+            .withExpiresAt(Date(now + 1000 * TTL))
             .withJWTId(keyProvider.privateKeyId)
+            .withClaim("name", account.displayName)
             .withClaim("tenant_id", tenantProvider.id())
             .withClaim("entity_type", "ACCOUNT")
 

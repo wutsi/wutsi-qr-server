@@ -8,6 +8,7 @@ import com.wutsi.platform.account.WutsiAccountApi
 import com.wutsi.platform.account.dto.Account
 import com.wutsi.platform.account.dto.GetAccountResponse
 import com.wutsi.platform.account.dto.Phone
+import com.wutsi.platform.qr.delegate.AccountDelegate
 import com.wutsi.platform.qr.dto.CreateAccountQRCodeResponse
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,7 +18,6 @@ import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.test.context.jdbc.Sql
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(value = ["/db/clean.sql", "/db/AccountController.sql"])
@@ -66,7 +66,8 @@ public class AccountControllerTest : AbstractSecuredController() {
         assertEquals(TENANT_ID, decoded.claims["tenant_id"]?.asLong())
         assertEquals("ACCOUNT", decoded.claims["entity_type"]?.asString())
         assertNotNull(decoded.issuedAt)
-        assertNull(decoded.expiresAt)
+        assertNotNull(decoded.expiresAt)
+        assertEquals(AccountDelegate.TTL * 1000L, decoded.expiresAt.time - decoded.issuedAt.time)
     }
 
     @Test
@@ -83,6 +84,7 @@ public class AccountControllerTest : AbstractSecuredController() {
         assertEquals(3333L, decoded.claims["tenant_id"]?.asLong())
         assertEquals("ACCOUNT", decoded.claims["entity_type"]?.asString())
         assertNotNull(decoded.issuedAt)
-        assertNull(decoded.expiresAt)
+        assertNotNull(decoded.expiresAt)
+        assertEquals(AccountDelegate.TTL * 1000L, decoded.expiresAt.time - decoded.issuedAt.time)
     }
 }

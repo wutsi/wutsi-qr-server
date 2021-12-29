@@ -14,6 +14,10 @@ public class PaymentDelegate(
     private val keyProvider: RSAKeyProviderImpl,
     private val tenantProvider: TenantProvider
 ) {
+    companion object {
+        const val TTL = 300 // 300 seconds
+    }
+
     public fun invoke(request: CreatePaymentQRCodeRequest): CreatePaymentQRCodeResponse {
         val now = System.currentTimeMillis()
 
@@ -26,15 +30,13 @@ public class PaymentDelegate(
             .withClaim("tenant_id", tenantProvider.id())
             .withClaim("entity_type", "PAYMENT")
             .withClaim("reference_id", request.referenceId)
+            .withExpiresAt(Date(now + 1000 * (request.timeToLive ?: TTL)))
 
         if (!request.invoiceId.isNullOrBlank())
             builder.withClaim("invoice_id", request.invoiceId)
 
         if (!request.description.isNullOrBlank())
             builder.withClaim("description", request.description)
-
-        if (request.timeToLive != null)
-            builder.withExpiresAt(Date(now + 1000 * request.timeToLive))
 
         return CreatePaymentQRCodeResponse(
             token = builder.sign(Algorithm.RSA256(keyProvider)),

@@ -1,6 +1,7 @@
 package com.wutsi.platform.qr.endpoint
 
 import com.auth0.jwt.JWT
+import com.wutsi.platform.qr.delegate.PaymentDelegate
 import com.wutsi.platform.qr.dto.CreatePaymentQRCodeRequest
 import com.wutsi.platform.qr.dto.CreatePaymentQRCodeResponse
 import org.junit.jupiter.api.Test
@@ -78,5 +79,28 @@ public class PaymentControllerTest : AbstractSecuredController() {
         assertNotNull(decoded.issuedAt)
         assertNotNull(decoded.expiresAt)
         assertEquals(request.timeToLive!!.toLong() * 1000L, decoded.expiresAt.time - decoded.issuedAt.time)
+    }
+
+    @Test
+    public fun generateWithoutTTL() {
+        val url = "http://localhost:$port/v1/payment"
+        val request = CreatePaymentQRCodeRequest(
+            invoiceId = "123",
+            referenceId = UUID.randomUUID().toString(),
+            currency = "XAF",
+            amount = 7999.0,
+            description = "Sample payment",
+            merchantId = 111,
+            timeToLive = null
+        )
+        val response = rest.postForEntity(url, request, CreatePaymentQRCodeResponse::class.java)
+
+        // THEN
+        assertEquals(200, response.statusCodeValue)
+
+        val decoded = JWT.decode(response.body?.token)
+        assertNotNull(decoded.issuedAt)
+        assertNotNull(decoded.expiresAt)
+        assertEquals(PaymentDelegate.TTL * 1000L, decoded.expiresAt.time - decoded.issuedAt.time)
     }
 }
