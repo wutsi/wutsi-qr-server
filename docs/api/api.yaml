@@ -30,8 +30,9 @@ paths:
           - `kid`: ID of the encryption key used for signing the token
 
         - The payload contains the following fields:
-          - `sub`: The subject - which represent the ID of the merchant
+          - `sub`: The subject - which represent the ID of the account
           - `iat`: Time when the token was issued
+          - `name`: Full name of the account
           - 'tenant_id': ID of the tenant
           - `entity_type`: Type of token. Must be `ACCOUNT`
 
