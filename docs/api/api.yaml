@@ -2,14 +2,7 @@ openapi: "3.0.0"
 info:
   title: "Wutsi QR API"
   description: |
-    API for generating QR Code tokens.
-
-    This API uses the [JWT](https://www.jwt.io) format for representing tokens.
-
-    It's a string in the format `xxxx.yyyy.zzzz`, componsed of 3 parts:
-    - The header: This is the `xxxx` part. It's a based 64 representation of the JSON containing the information about encryption algorigtm.
-    - The payload: This is the `yyyy` part. The payload contains the representation of the entity encoded.
-    - The signature: This is the `zzzz` part. The digital signature of the token, to verify the authenticity of the token
+    API for generating QR Code.
 
   version: "1.0.0"
 
@@ -25,16 +18,7 @@ paths:
       operationId: "account"
       description: |
         Create a QR code token for the current user.
-        - The Header contains the following fields:
-          - `alg`: Encryption algorith used
-          - `kid`: ID of the encryption key used for signing the token
-
-        - The payload contains the following fields:
-          - `sub`: The subject - which represent the ID of the account
-          - `iat`: Time when the token was issued
-          - `name`: Full name of the account
-          - 'tenant_id': ID of the tenant
-          - `entity_type`: Type of token. Must be `ACCOUNT`
+        The format is `account:<account-id>:<expiry-time>`
 
       responses:
         200:
@@ -53,21 +37,7 @@ paths:
       operationId: "payment"
       description: |
         Create a QR code token for a payment request.
-        - The Header contains the following fields:
-          - `alg`: Encryption algorith used
-          - `kid`: ID of the encryption key used for signing the token
-
-        - The payload contains the following fields:
-          - `sub`: The subject - which represent the ID of the merchant
-          - `iat`: Time when the token was issued
-          - `exp`: The expiration time of the token. If a payment is performed after this time, it should fails
-          - `amount`: The amount of the payment
-          - `currency`: The currency of the payment
-          - `invoice_id`: ID of the invoice associate with the payment
-          - `reference_id`: Reference ID
-          - `description`: Description of the payment (max: 100 characters)
-          - 'tenant_id': ID of the tenant
-          - `entity_type`: Type of token. Must be `PAYMENT`
+        The format is `payment:<merchant-id>:<reference-id>:<amount>:<currency>:<expiry-time>`
 
       requestBody:
         required: true
@@ -87,29 +57,6 @@ paths:
       security:
         - api_key: [ 'qr-manage' ]
 
-
-  /v1/keys/{id}:
-    get:
-      operationId: "get-key"
-      description: |
-        Return the current security key used to signing the QR codes
-      parameters:
-        - in: path
-          name: id
-          description: ID of the key
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetKeyResponse'
-      security:
-        - api_key: [ 'qr-read' ]
 
 components:
   securitySchemes:
@@ -139,14 +86,6 @@ components:
           type: string
           description: 3 letter currency code
           maxLength: 3
-        description:
-          type: string
-          description: Description of the payment
-          nullable: true
-        invoiceId:
-          type: string
-          description: ID of the invoice
-          nullable: true
         timeToLive:
           type: integer
           description: Time-To-Live of the QR code
@@ -169,21 +108,3 @@ components:
         token:
           type: string
           description: QR Code Token
-
-    GetKeyResponse:
-      type: object
-      properties:
-        key:
-          type: object
-          $ref: "#/components/schemas/Key"
-
-    Key:
-      type: object
-      properties:
-        algorithm:
-          type: string
-          description: Name of the security algorithm
-        content:
-          type: string
-          description: Content of the key, based-64 encoded
-

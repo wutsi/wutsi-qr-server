@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate
 
 abstract class AbstractSecuredController {
     companion object {
-        const val USER_ID = 1L
+        const val USER_ID = 9999L
         const val TENANT_ID = 777L
     }
 

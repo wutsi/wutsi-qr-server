@@ -1,95 +1,58 @@
 package com.wutsi.platform.qr.endpoint
 
-import com.auth0.jwt.JWT
-import com.wutsi.platform.qr.delegate.PaymentDelegate
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.whenever
 import com.wutsi.platform.qr.dto.CreatePaymentQRCodeRequest
 import com.wutsi.platform.qr.dto.CreatePaymentQRCodeResponse
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.web.server.LocalServerPort
-import org.springframework.test.context.jdbc.Sql
-import java.util.UUID
+import java.time.Clock
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(value = ["/db/clean.sql", "/db/PaymentController.sql"])
 public class PaymentControllerTest : AbstractSecuredController() {
     @LocalServerPort
     public val port: Int = 0
 
+    @MockBean
+    private lateinit var clock: Clock
+
+    private lateinit var url: String
+
+    @BeforeEach
+    override fun setUp() {
+        super.setUp()
+
+        url = "http://localhost:$port/v1/payment"
+
+        doReturn(1000000L).whenever(clock).millis()
+    }
+
     @Test
-    public fun generateWithExistingKey() {
-        val url = "http://localhost:$port/v1/payment"
+    public fun generate() {
         val request = CreatePaymentQRCodeRequest(
-            invoiceId = "123",
-            referenceId = UUID.randomUUID().toString(),
+            referenceId = "aaaaa",
             currency = "XAF",
             amount = 7999.0,
-            description = "Sample payment",
             merchantId = 111,
-            timeToLive = 300
+            timeToLive = 100
         )
         val response = rest.postForEntity(url, request, CreatePaymentQRCodeResponse::class.java)
 
         // THEN
         assertEquals(200, response.statusCodeValue)
-
-        val decoded = JWT.decode(response.body?.token)
-        assertEquals(request.merchantId.toString(), decoded.subject)
-        assertEquals("100", decoded.keyId)
-        assertEquals(request.amount, decoded.claims["amount"]?.asDouble())
-        assertEquals(request.currency, decoded.claims["currency"]?.asString())
-        assertEquals(request.description, decoded.claims["description"]?.asString())
-        assertEquals(request.referenceId, decoded.claims["reference_id"]?.asString())
-        assertEquals(request.invoiceId, decoded.claims["invoice_id"]?.asString())
-        assertEquals(TENANT_ID, decoded.claims["tenant_id"]?.asLong())
-        assertNotNull(decoded.issuedAt)
-        assertNotNull(decoded.expiresAt)
-        assertEquals(request.timeToLive!!.toLong() * 1000L, decoded.expiresAt.time - decoded.issuedAt.time)
+        assertEquals("payment:111:aaaaa:799900:XAF:1100000", response.body.token)
     }
 
     @Test
-    public fun generateWithoutKeystore() {
-        val url = "http://localhost:$port/v1/payment"
+    public fun generateNoTTL() {
         val request = CreatePaymentQRCodeRequest(
-            invoiceId = "123",
-            referenceId = UUID.randomUUID().toString(),
+            referenceId = "aaaaa",
             currency = "XAF",
             amount = 7999.0,
-            description = "Sample payment",
-            merchantId = 111,
-            timeToLive = 300
-        )
-        val rest = createResTemplate(tenantId = 3333L)
-        val response = rest.postForEntity(url, request, CreatePaymentQRCodeResponse::class.java)
-
-        // THEN
-        assertEquals(200, response.statusCodeValue)
-
-        val decoded = JWT.decode(response.body?.token)
-        assertEquals(request.merchantId.toString(), decoded.subject)
-        assertNotNull(decoded.keyId)
-        assertEquals(request.amount, decoded.claims["amount"]?.asDouble())
-        assertEquals(request.currency, decoded.claims["currency"]?.asString())
-        assertEquals(request.description, decoded.claims["description"]?.asString())
-        assertEquals(request.referenceId, decoded.claims["reference_id"]?.asString())
-        assertEquals(request.invoiceId, decoded.claims["invoice_id"]?.asString())
-        assertEquals(3333L, decoded.claims["tenant_id"]?.asLong())
-        assertNotNull(decoded.issuedAt)
-        assertNotNull(decoded.expiresAt)
-        assertEquals(request.timeToLive!!.toLong() * 1000L, decoded.expiresAt.time - decoded.issuedAt.time)
-    }
-
-    @Test
-    public fun generateWithoutTTL() {
-        val url = "http://localhost:$port/v1/payment"
-        val request = CreatePaymentQRCodeRequest(
-            invoiceId = "123",
-            referenceId = UUID.randomUUID().toString(),
-            currency = "XAF",
-            amount = 7999.0,
-            description = "Sample payment",
             merchantId = 111,
             timeToLive = null
         )
@@ -97,10 +60,6 @@ public class PaymentControllerTest : AbstractSecuredController() {
 
         // THEN
         assertEquals(200, response.statusCodeValue)
-
-        val decoded = JWT.decode(response.body?.token)
-        assertNotNull(decoded.issuedAt)
-        assertNotNull(decoded.expiresAt)
-        assertEquals(PaymentDelegate.TTL * 1000L, decoded.expiresAt.time - decoded.issuedAt.time)
+        assertEquals("payment:111:aaaaa:799900:XAF:1300000", response.body.token)
     }
 }

@@ -4,7 +4,7 @@
 [![](https://img.shields.io/badge/maven-3.6-brightgreen.svg)](https://maven.apache.org/download.cgi)
 ![](https://img.shields.io/badge/language-kotlin-blue.svg)
 
-API for generating QR Code tokens.&#10;&#10;This API uses the [JWT](https://www.jwt.io) format for representing tokens.&#10;&#10;It&#39;s a string in the format &#96;xxxx.yyyy.zzzz&#96;, componsed of 3 parts:&#10;- The header: This is the &#96;xxxx&#96; part. It&#39;s a based 64 representation of the JSON containing the information about encryption algorigtm.&#10;- The payload: This is the &#96;yyyy&#96; part. The payload contains the representation of the entity encoded.&#10;- The signature: This is the &#96;zzzz&#96; part. The digital signature of the token, to verify the authenticity of the token&#10;
+API for generating QR Code.&#10;
 
 # Installation Prerequisites
 ## Database Setup

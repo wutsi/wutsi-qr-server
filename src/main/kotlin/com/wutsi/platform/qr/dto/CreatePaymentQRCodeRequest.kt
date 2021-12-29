@@ -17,7 +17,5 @@ public data class CreatePaymentQRCodeRequest(
     @get:NotBlank
     @get:Size(max = 3)
     public val currency: String = "",
-    public val description: String? = null,
-    public val invoiceId: String? = null,
     public val timeToLive: Int? = null
 )
