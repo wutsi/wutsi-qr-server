@@ -13,45 +13,45 @@ servers:
     description: Production
 
 paths:
-  /v1/account:
+  /v1/encoder:
     post:
-      operationId: "account"
-      description: |
-        Create a QR code token for the current user.
-        The format is `account:<account-id>:<expiry-time>`
-
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateAccountQRCodeResponse'
-      tags:
-        - QR
-      security:
-        - api_key: [ 'qr-manage' ]
-
-  /v1/payment:
-    post:
-      operationId: "payment"
-      description: |
-        Create a QR code token for a payment request.
-        The format is `payment:<merchant-id>:<reference-id>:<amount>:<currency>:<expiry-time>`
-
+      operationId: "encode"
+      description: Convert an entity to its QR code representation
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreatePaymentQRCodeRequest'
+              $ref: '#/components/schemas/EncodeQRCodeRequest'
       responses:
         200:
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreatePaymentQRCodeResponse'
+                $ref: '#/components/schemas/EncodeQRCodeResponse'
+      tags:
+        - QR
+      security:
+        - api_key: [ 'qr-manage' ]
+
+  /v1/decoder:
+    post:
+      operationId: "decode"
+      description: Convert a QR code to its entity representation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecodeQRCodeRequest'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecodeQRCodeResponse'
       tags:
         - QR
       security:
@@ -66,45 +66,56 @@ components:
       name: Authorization
 
   schemas:
-    CreatePaymentQRCodeRequest:
+    EncodeQRCodeRequest:
       type: object
       properties:
-        referenceId:
+        type:
           type: string
-          format: uuid
-          description: Unique identifier of the request
-        merchantId:
-          type: integer
-          format: int64
-          description: Merchant Account ID
-        amount:
-          type: number
-          format: double
-          description: Amount of the order
-          minimum: 0
-        currency:
+          description: Name of the entity
+        id:
           type: string
-          description: 3 letter currency code
-          maxLength: 3
+          description: ID of the entity
         timeToLive:
           type: integer
-          description: Time-To-Live of the QR code
-          nullable: true
+          description: Time-To-Live of the QR code in seconds
       required:
-        - currency
-        - referenceId
+        - type
+        - id
 
-    CreatePaymentQRCodeResponse:
+    EncodeQRCodeResponse:
       type: object
       properties:
         token:
           type: string
           description: QR Code Token
 
-
-    CreateAccountQRCodeResponse:
+    DecodeQRCodeRequest:
       type: object
       properties:
         token:
           type: string
-          description: QR Code Token
+          description: QR code token
+      required:
+        - token
+
+    Entity:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Name of the entity
+        id:
+          type: string
+          description: ID of the entity
+        expires:
+          type: integer
+          format: int64
+          description: Expiry time
+
+    DecodeQRCodeResponse:
+      type: object
+      properties:
+        entity:
+          type: object
+          description: Decoded entity
+          $ref: "#/components/schemas/Entity"

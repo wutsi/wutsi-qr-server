@@ -7,10 +7,6 @@
 API for generating QR Code.&#10;
 
 # Installation Prerequisites
-## Database Setup
-- Install postgres
-- Create account with username/password: `postgres`/`postgres`
-- Create a database named `wutsi-qr`
 
 ## Configure Github
 - Generate a Github token for accessing packages from GibHub

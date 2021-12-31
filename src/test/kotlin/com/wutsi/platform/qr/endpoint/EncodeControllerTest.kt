@@ -2,7 +2,8 @@ package com.wutsi.platform.qr.endpoint
 
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.whenever
-import com.wutsi.platform.qr.dto.CreateAccountQRCodeResponse
+import com.wutsi.platform.qr.dto.EncodeQRCodeRequest
+import com.wutsi.platform.qr.dto.EncodeQRCodeResponse
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
@@ -12,7 +13,7 @@ import java.time.Clock
 import kotlin.test.assertEquals
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AccountControllerTest : AbstractSecuredController() {
+public class EncodeControllerTest : AbstractSecuredController() {
     @LocalServerPort
     public val port: Int = 0
 
@@ -25,19 +26,24 @@ public class AccountControllerTest : AbstractSecuredController() {
     override fun setUp() {
         super.setUp()
 
-        url = "http://localhost:$port/v1/account"
+        url = "http://localhost:$port/v1/encoder"
 
         doReturn(1000000L).whenever(clock).millis()
     }
 
     @Test
-    public fun generateWithKeystore() {
+    public fun encode() {
         // WHEN
-        val response = rest.postForEntity(url, null, CreateAccountQRCodeResponse::class.java)
+        val request = EncodeQRCodeRequest(
+            type = "ACCOUNT",
+            id = "7777",
+            timeToLive = 300
+        )
+        val response = rest.postForEntity(url, request, EncodeQRCodeResponse::class.java)
 
         // THEN
         assertEquals(200, response.statusCodeValue)
 
-        assertEquals("account:$USER_ID:1300000", response.body?.token)
+        assertEquals("account:7777:1300000", response.body?.token)
     }
 }
