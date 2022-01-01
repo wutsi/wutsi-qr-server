@@ -4,6 +4,7 @@ import com.wutsi.platform.core.error.Error
 import com.wutsi.platform.core.error.Parameter
 import com.wutsi.platform.core.error.ParameterType
 import com.wutsi.platform.core.error.exception.ConflictException
+import com.wutsi.platform.core.logging.KVLogger
 import com.wutsi.platform.qr.dto.DecodeQRCodeRequest
 import com.wutsi.platform.qr.dto.DecodeQRCodeResponse
 import com.wutsi.platform.qr.dto.Entity
@@ -12,8 +13,13 @@ import org.springframework.stereotype.Service
 import java.time.Clock
 
 @Service
-public class DecodeDelegate(private val clock: Clock) {
+public class DecodeDelegate(
+    private val clock: Clock,
+    private val logger: KVLogger
+) {
     public fun invoke(request: DecodeQRCodeRequest): DecodeQRCodeResponse {
+        logger.add("token", request.token)
+
         val parts = request.token.split(':')
         if (parts.size != 3)
             throw exception(ErrorURN.MALFORMED_TOKEN, request)
@@ -23,12 +29,17 @@ public class DecodeDelegate(private val clock: Clock) {
             if (expires < clock.millis())
                 throw exception(ErrorURN.EXPIRED, request)
 
+            val entity = Entity(
+                type = parts[0],
+                id = parts[1],
+                expires = expires
+            )
+
+            logger.add("entity_id", entity.id)
+            logger.add("entity_type", entity.type)
+            logger.add("entity_expires", entity.expires)
             return DecodeQRCodeResponse(
-                entity = Entity(
-                    type = parts[0],
-                    id = parts[1],
-                    expires = expires
-                )
+                entity = entity
             )
         } catch (ex: NumberFormatException) {
             throw exception(ErrorURN.MALFORMED_TOKEN, request)
