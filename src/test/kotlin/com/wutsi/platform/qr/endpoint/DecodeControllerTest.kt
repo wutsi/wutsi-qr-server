@@ -52,6 +52,21 @@ public class DecodeControllerTest : AbstractSecuredController() {
     }
 
     @Test
+    public fun decodeUrl() {
+        val request = DecodeQRCodeRequest(
+            token = "https://www.google.com"
+        )
+        val response = rest.postForEntity(url, request, DecodeQRCodeResponse::class.java)
+
+        assertEquals(200, response.statusCodeValue)
+
+        val entity = response.body!!.entity
+        assertEquals("url", entity.type)
+        assertEquals(request.token, entity.id)
+        assertEquals(Long.MAX_VALUE, entity.expires)
+    }
+
+    @Test
     public fun malformed() {
         val request = DecodeQRCodeRequest(
             token = "account:1111:2000000:xxx"

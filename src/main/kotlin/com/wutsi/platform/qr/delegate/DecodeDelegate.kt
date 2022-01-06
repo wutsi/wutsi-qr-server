@@ -20,6 +20,15 @@ public class DecodeDelegate(
     public fun invoke(request: DecodeQRCodeRequest): DecodeQRCodeResponse {
         logger.add("token", request.token)
 
+        if (request.token.startsWith("http://") || request.token.startsWith("https://"))
+            return DecodeQRCodeResponse(
+                entity = Entity(
+                    type = "url",
+                    id = request.token,
+                    expires = Long.MAX_VALUE
+                )
+            )
+
         val parts = request.token.split(':')
         if (parts.size != 3)
             throw exception(ErrorURN.MALFORMED_TOKEN, request)
