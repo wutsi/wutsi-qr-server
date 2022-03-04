@@ -10,11 +10,8 @@ API for generating QR Code
 
 The format for QR Code is:
 
-```xml
-
-<entity>:
-    <id>:
-        <expires>
+```
+<entity>-<id>-<expires>
 ```
 
 Where:
@@ -26,7 +23,8 @@ Where:
     - `order`
     - `payment_request`
 - `<id>`: The identifier of the entity
-- `<expires>`: The time in seconds when this code expires. For static QR code, the expiry date is set in 100 years :-)
+- `<expires>`: The time (in seconds, since epoch time) when this code expires. For static QR code, the expiry date is
+  set in 100 years :-)
 
 # Links
 

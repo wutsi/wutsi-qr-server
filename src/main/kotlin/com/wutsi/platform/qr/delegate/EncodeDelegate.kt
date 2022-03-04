@@ -18,7 +18,7 @@ class EncodeDelegate(
 
         val type = EntityType.valueOf(request.type.replace('-', '_').uppercase())
         val expiry = clock.millis() / 1000 + type.timeToLiveSeconds
-        val token = "${type.name}:${request.id}:$expiry".lowercase()
+        val token = "${type.name}-${request.id}-$expiry".lowercase()
 
         logger.add("token", token)
         return EncodeQRCodeResponse(

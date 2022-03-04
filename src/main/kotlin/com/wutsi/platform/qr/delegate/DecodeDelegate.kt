@@ -3,6 +3,7 @@ package com.wutsi.platform.qr.`delegate`
 import com.wutsi.platform.core.error.Error
 import com.wutsi.platform.core.error.Parameter
 import com.wutsi.platform.core.error.ParameterType
+import com.wutsi.platform.core.error.exception.BadRequestException
 import com.wutsi.platform.core.error.exception.ConflictException
 import com.wutsi.platform.core.logging.KVLogger
 import com.wutsi.platform.qr.dto.DecodeQRCodeRequest
@@ -29,14 +30,14 @@ class DecodeDelegate(
                 )
             )
 
-        val parts = request.token.split(':')
+        val parts = request.token.split('-')
         if (parts.size != 3)
-            throw exception(ErrorURN.MALFORMED_TOKEN, request)
+            throw malformedTokenException(request)
 
         try {
             val expires = parts[2].toLong()
             if (expires < clock.millis() / 1000)
-                throw exception(ErrorURN.EXPIRED, request)
+                throw expiredException(request)
 
             val entity = Entity(
                 type = parts[0],
@@ -51,14 +52,26 @@ class DecodeDelegate(
                 entity = entity
             )
         } catch (ex: NumberFormatException) {
-            throw exception(ErrorURN.MALFORMED_TOKEN, request)
+            throw malformedTokenException(request)
         }
     }
 
-    private fun exception(code: ErrorURN, request: DecodeQRCodeRequest): Exception =
+    private fun malformedTokenException(request: DecodeQRCodeRequest): Exception =
+        BadRequestException(
+            error = Error(
+                code = ErrorURN.MALFORMED_TOKEN.urn,
+                parameter = Parameter(
+                    name = "token",
+                    value = request.token,
+                    type = ParameterType.PARAMETER_TYPE_PAYLOAD
+                )
+            )
+        )
+
+    private fun expiredException(request: DecodeQRCodeRequest): Exception =
         ConflictException(
             error = Error(
-                code = code.urn,
+                code = ErrorURN.EXPIRED.urn,
                 parameter = Parameter(
                     name = "token",
                     value = request.token,

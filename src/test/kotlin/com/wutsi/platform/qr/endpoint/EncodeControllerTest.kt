@@ -41,7 +41,7 @@ class EncodeControllerTest : AbstractSecuredController() {
         // THEN
         assertEquals(200, response.statusCodeValue)
 
-        assertEquals("account:7777:3087901000", response.body?.token)
+        assertEquals("account-7777-3087901000", response.body?.token)
     }
 
     @Test
@@ -53,7 +53,7 @@ class EncodeControllerTest : AbstractSecuredController() {
         // THEN
         assertEquals(200, response.statusCodeValue)
 
-        assertEquals("order:7777:3087901000", response.body?.token)
+        assertEquals("order-7777-3087901000", response.body?.token)
     }
 
     @Test
@@ -65,7 +65,7 @@ class EncodeControllerTest : AbstractSecuredController() {
         // THEN
         assertEquals(200, response.statusCodeValue)
 
-        assertEquals("product:7777:3087901000", response.body?.token)
+        assertEquals("product-7777-3087901000", response.body?.token)
     }
 
     @Test
@@ -77,7 +77,7 @@ class EncodeControllerTest : AbstractSecuredController() {
         // THEN
         assertEquals(200, response.statusCodeValue)
 
-        assertEquals("payment_request:7777:1300", response.body?.token)
+        assertEquals("payment_request-7777-1300", response.body?.token)
     }
 
     private fun createRequest(type: EntityType) = EncodeQRCodeRequest(

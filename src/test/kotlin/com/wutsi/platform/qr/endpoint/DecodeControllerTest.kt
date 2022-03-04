@@ -18,9 +18,9 @@ import java.time.Clock
 import kotlin.test.assertEquals
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class DecodeControllerTest : AbstractSecuredController() {
+class DecodeControllerTest : AbstractSecuredController() {
     @LocalServerPort
-    public val port: Int = 0
+    val port: Int = 0
 
     @MockBean
     private lateinit var clock: Clock
@@ -37,9 +37,9 @@ public class DecodeControllerTest : AbstractSecuredController() {
     }
 
     @Test
-    public fun decode() {
+    fun decode() {
         val request = DecodeQRCodeRequest(
-            token = "account:1111:2000000"
+            token = "account-1111-2000000"
         )
         val response = rest.postForEntity(url, request, DecodeQRCodeResponse::class.java)
 
@@ -52,7 +52,7 @@ public class DecodeControllerTest : AbstractSecuredController() {
     }
 
     @Test
-    public fun decodeUrl() {
+    fun decodeUrl() {
         val request = DecodeQRCodeRequest(
             token = "https://www.google.com"
         )
@@ -67,39 +67,39 @@ public class DecodeControllerTest : AbstractSecuredController() {
     }
 
     @Test
-    public fun malformed() {
+    fun malformed() {
         val request = DecodeQRCodeRequest(
-            token = "account:1111:2000000:xxx"
+            token = "account-1111-2000000-xxx"
         )
         val ex = assertThrows<HttpClientErrorException> {
             rest.postForEntity(url, request, DecodeQRCodeResponse::class.java)
         }
 
-        assertEquals(409, ex.rawStatusCode)
+        assertEquals(400, ex.rawStatusCode)
 
         val response = ObjectMapper().readValue(ex.responseBodyAsString, ErrorResponse::class.java)
         assertEquals(ErrorURN.MALFORMED_TOKEN.urn, response.error.code)
     }
 
     @Test
-    public fun invalidExpiryDate() {
+    fun invalidExpiryDate() {
         val request = DecodeQRCodeRequest(
-            token = "account:1111:xxx"
+            token = "account-1111-xxx"
         )
         val ex = assertThrows<HttpClientErrorException> {
             rest.postForEntity(url, request, DecodeQRCodeResponse::class.java)
         }
 
-        assertEquals(409, ex.rawStatusCode)
+        assertEquals(400, ex.rawStatusCode)
 
         val response = ObjectMapper().readValue(ex.responseBodyAsString, ErrorResponse::class.java)
         assertEquals(ErrorURN.MALFORMED_TOKEN.urn, response.error.code)
     }
 
     @Test
-    public fun expired() {
+    fun expired() {
         val request = DecodeQRCodeRequest(
-            token = "account:1111:11"
+            token = "account-1111-11"
         )
         val ex = assertThrows<HttpClientErrorException> {
             rest.postForEntity(url, request, DecodeQRCodeResponse::class.java)

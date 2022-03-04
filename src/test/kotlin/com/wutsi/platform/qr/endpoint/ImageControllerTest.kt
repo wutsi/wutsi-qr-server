@@ -16,7 +16,8 @@ internal class ImageControllerTest : AbstractSecuredController() {
     @Test
     fun fetch() {
         // WHEN
-        val cnn = URL("http://localhost:$port/image/xxxxxx.png").openConnection()
+        val ttl = Long.MAX_VALUE
+        val cnn = URL("http://localhost:$port/image/account-2309209-$ttl.png").openConnection()
 
         // THEN
         try {
