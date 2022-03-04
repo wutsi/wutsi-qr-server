@@ -4,57 +4,31 @@
 [![](https://img.shields.io/badge/maven-3.6-brightgreen.svg)](https://maven.apache.org/download.cgi)
 ![](https://img.shields.io/badge/language-kotlin-blue.svg)
 
-API for generating QR Code.&#10;
+API for generating QR Code
 
-# Installation Prerequisites
+# QR Code Format
 
-## Configure Github
-- Generate a Github token for accessing packages from GibHub
-  - Goto [https://github.com/settings/tokens](https://github.com/settings/tokens)
-  - Click on `Generate New Token`
-  - Give a value to your token
-  - Select the permissions `read:packages`
-  - Generate the token
-- Set your GitHub environment variables on your machine:
-  - `GITHUB_TOKEN = your-token-value`
-  - `GITHUB_USER = your-github-user-name`
+The format for QR Code is:
 
-## Maven Setup
-- Download Instance [Maven 3.6+](https://maven.apache.org/download.cgi)
-- Add into `~/m2/settings.xml`
-```
-    <settings>
-        ...
-        <servers>
-            ...
-            <server>
-              <id>github</id>
-              <username>${env.GITHUB_USER}</username>
-              <password>${env.GITHUB_TOKEN}</password>
-            </server>
-        </servers>
-    </settings>
+```xml
+
+<entity>:
+    <id>:
+        <expires>
 ```
 
-## Usage
-- Install
-```
-$ git clone git@github.com:wutsi/wutsi-qr-server.git
-```
+Where:
 
-- Build
-```
-$ cd wutsi-qr-server
-$ mvn clean install
-```
-
-- Launch the API
-```
-$ mvn spring-boot:run
-```
-
-That's it... the API is up and running! Start sending requests :-)
+- `<entity>`: The type of entity encoded. Values are:
+    - `url`
+    - `account`
+    - `product`
+    - `order`
+    - `payment_request`
+- `<id>`: The identifier of the entity
+- `<expires>`: The time in seconds when this code expires. For static QR code, the expiry date is set in 100 years :-)
 
 # Links
+
 - [API](https://wutsi.github.io/wutsi-qr-server/api/)
 - [Documentation](docs/)
