@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service
 import java.time.Clock
 
 @Service
-public class DecodeDelegate(
+class DecodeDelegate(
     private val clock: Clock,
     private val logger: KVLogger
 ) {
-    public fun invoke(request: DecodeQRCodeRequest): DecodeQRCodeResponse {
+    fun invoke(request: DecodeQRCodeRequest): DecodeQRCodeResponse {
         logger.add("token", request.token)
 
         if (request.token.startsWith("http://") || request.token.startsWith("https://"))
@@ -35,7 +35,7 @@ public class DecodeDelegate(
 
         try {
             val expires = parts[2].toLong()
-            if (expires < clock.millis())
+            if (expires < clock.millis() / 1000)
                 throw exception(ErrorURN.EXPIRED, request)
 
             val entity = Entity(

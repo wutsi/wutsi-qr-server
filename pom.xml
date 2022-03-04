@@ -29,6 +29,8 @@
     <kotlin.version>1.6.10</kotlin.version>
     <kotlin-mockito.version>2.2.0</kotlin-mockito.version>
     <klint.version>0.43.2</klint.version>
+    <qrcode-kotlin.version>2.0.0</qrcode-kotlin.version>
+
     <maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
     <wutsi-platform-core.version>0.0.94</wutsi-platform-core.version>
     <wutsi-security.version>0.0.16</wutsi-security.version>
@@ -44,6 +46,12 @@
       <groupId>com.wutsi.platform.security</groupId>
       <artifactId>wutsi-security-sdk-kotlin</artifactId>
       <version>${wutsi-security.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.github.g0dkar</groupId>
+      <artifactId>qrcode-kotlin</artifactId>
+      <version>${qrcode-kotlin.version}</version>
     </dependency>
 
     <dependency>

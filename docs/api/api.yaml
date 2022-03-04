@@ -72,12 +72,14 @@ components:
         type:
           type: string
           description: Name of the entity
+          enum:
+            - ACCOUNT
+            - PRODUCT
+            - URL
+            - PAYMENT_REQUEST
         id:
           type: string
           description: ID of the entity
-        timeToLive:
-          type: integer
-          description: Time-To-Live of the QR code in seconds
       required:
         - type
         - id
