@@ -11,7 +11,7 @@ API for generating QR Code
 The format for QR Code is:
 
 ```
-<entity>-<id>-<expires>
+<entity>,<id>,<expires>
 ```
 
 Where:
