@@ -30,7 +30,7 @@ class DecodeDelegate(
                 )
             )
 
-        val parts = request.token.split('-')
+        val parts = request.token.split(',')
         if (parts.size != 3)
             throw malformedTokenException(request)
 

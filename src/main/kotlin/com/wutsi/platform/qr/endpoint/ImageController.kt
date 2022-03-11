@@ -16,9 +16,13 @@ import org.springframework.web.bind.annotation.RestController
 import java.io.ByteArrayOutputStream
 
 @RestController
-class ImageController(private val decoder: DecodeDelegate, private val logger: KVLogger) {
+class ImageController(
+    private val decoder: DecodeDelegate,
+    private val logger: KVLogger
+) {
     @GetMapping("/image/{token}.png")
     fun invoke(@PathVariable token: String): ResponseEntity<ByteArray> {
+        logger.add("token", token)
         try {
             decoder.invoke(
                 DecodeQRCodeRequest(token)

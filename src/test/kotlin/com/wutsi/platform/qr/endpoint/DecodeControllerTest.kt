@@ -39,7 +39,7 @@ class DecodeControllerTest : AbstractSecuredController() {
     @Test
     fun decode() {
         val request = DecodeQRCodeRequest(
-            token = "account-1111-2000000"
+            token = "account,1111,2000000"
         )
         val response = rest.postForEntity(url, request, DecodeQRCodeResponse::class.java)
 
@@ -69,7 +69,7 @@ class DecodeControllerTest : AbstractSecuredController() {
     @Test
     fun malformed() {
         val request = DecodeQRCodeRequest(
-            token = "account-1111-2000000-xxx"
+            token = "account,1111,2000000_xxx"
         )
         val ex = assertThrows<HttpClientErrorException> {
             rest.postForEntity(url, request, DecodeQRCodeResponse::class.java)
@@ -84,7 +84,7 @@ class DecodeControllerTest : AbstractSecuredController() {
     @Test
     fun invalidExpiryDate() {
         val request = DecodeQRCodeRequest(
-            token = "account-1111-xxx"
+            token = "account,1111,xxx"
         )
         val ex = assertThrows<HttpClientErrorException> {
             rest.postForEntity(url, request, DecodeQRCodeResponse::class.java)
@@ -99,7 +99,7 @@ class DecodeControllerTest : AbstractSecuredController() {
     @Test
     fun expired() {
         val request = DecodeQRCodeRequest(
-            token = "account-1111-11"
+            token = "account,1111,11"
         )
         val ex = assertThrows<HttpClientErrorException> {
             rest.postForEntity(url, request, DecodeQRCodeResponse::class.java)
