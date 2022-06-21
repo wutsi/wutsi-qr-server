@@ -11,7 +11,7 @@ import javax.validation.Valid
 
 @RestController
 public class DecodeController(
-    private val `delegate`: DecodeDelegate
+    public val `delegate`: DecodeDelegate,
 ) {
     @PostMapping("/v1/decoder")
     @PreAuthorize(value = "hasAuthority('qr-manage')")

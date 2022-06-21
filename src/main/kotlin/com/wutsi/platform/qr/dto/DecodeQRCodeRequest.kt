@@ -5,5 +5,5 @@ import kotlin.String
 
 public data class DecodeQRCodeRequest(
     @get:NotBlank
-    public val token: String = ""
+    public val token: String = "",
 )

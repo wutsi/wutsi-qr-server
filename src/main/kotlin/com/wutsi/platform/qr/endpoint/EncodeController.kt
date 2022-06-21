@@ -11,7 +11,7 @@ import javax.validation.Valid
 
 @RestController
 public class EncodeController(
-    private val `delegate`: EncodeDelegate
+    public val `delegate`: EncodeDelegate,
 ) {
     @PostMapping("/v1/encoder")
     @PreAuthorize(value = "hasAuthority('qr-manage')")

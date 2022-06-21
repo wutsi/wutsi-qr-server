@@ -6,5 +6,5 @@ import kotlin.String
 public data class Entity(
     public val type: String = "",
     public val id: String = "",
-    public val expires: Long = 0
+    public val expires: Long = 0,
 )

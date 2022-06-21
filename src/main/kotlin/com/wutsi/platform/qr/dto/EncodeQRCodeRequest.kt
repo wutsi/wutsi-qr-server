@@ -7,5 +7,5 @@ public data class EncodeQRCodeRequest(
     @get:NotBlank
     public val type: String = "",
     @get:NotBlank
-    public val id: String = ""
+    public val id: String = "",
 )
