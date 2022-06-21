@@ -19,8 +19,8 @@
   </parent>
 
   <properties>
-    <jacoco.threshold.line>0.91</jacoco.threshold.line>
-    <jacoco.threshold.class>0.94</jacoco.threshold.class>
+    <jacoco.threshold.line>0.83</jacoco.threshold.line>
+    <jacoco.threshold.class>0.93</jacoco.threshold.class>
     <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
     <jdk.version>11</jdk.version>
 
@@ -28,11 +28,15 @@
     <junit.version>5.8.2</junit.version>
     <kotlin.version>1.6.21</kotlin.version>
     <kotlin-mockito.version>2.2.0</kotlin-mockito.version>
-    <klint.version>0.45.2</klint.version>
+    <klint.version>0.46.0</klint.version>
     <qrcode-kotlin.version>2.0.1</qrcode-kotlin.version>
     <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
+    <hikari-cp.version>5.0.1</hikari-cp.version>
+    <postgresql.version>42.4.0</postgresql.version>
+    <flyway.version>8.5.13</flyway.version>
+
     <wutsi-platform-core.version>0.0.116</wutsi-platform-core.version>
-    <wutsi-security.version>0.0.16</wutsi-security.version>
+    <wutsi-security.version>0.0.21</wutsi-security.version>
   </properties>
 
   <dependencies>
@@ -76,6 +80,26 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+      <version>${hikari-cp.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${postgresql.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+      <version>${flyway.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>

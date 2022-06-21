@@ -9,11 +9,13 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.boot.web.server.LocalServerPort
+import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.test.context.jdbc.Sql
 import java.time.Clock
 import kotlin.test.assertEquals
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(value = ["/db/clean.sql", "/db/EncodeController.sql"])
 class EncodeControllerTest : AbstractSecuredController() {
     @LocalServerPort
     val port: Int = 0
@@ -41,7 +43,10 @@ class EncodeControllerTest : AbstractSecuredController() {
         // THEN
         assertEquals(200, response.statusCodeValue)
 
-        assertEquals("account,7777,3087901000", response.body?.token)
+        assertEquals(
+            "YWNjb3VudCw3Nzc3LDMwODc5MDEwMDA=.MTAw.YjQ2OWY2YWM0MWNjNzFhNmZmMjlkMjYwZDZiYjMxNDA=",
+            response.body?.token
+        )
     }
 
     @Test
@@ -53,7 +58,10 @@ class EncodeControllerTest : AbstractSecuredController() {
         // THEN
         assertEquals(200, response.statusCodeValue)
 
-        assertEquals("order,7777,3087901000", response.body?.token)
+        assertEquals(
+            "b3JkZXIsNzc3NywzMDg3OTAxMDAw.MTAw.NDFiMmRmNjAyNTU3Yzc1MzE1NTEzNDNlY2FhMjdiMWM=",
+            response.body?.token
+        )
     }
 
     @Test
@@ -65,19 +73,10 @@ class EncodeControllerTest : AbstractSecuredController() {
         // THEN
         assertEquals(200, response.statusCodeValue)
 
-        assertEquals("product,7777,3087901000", response.body?.token)
-    }
-
-    @Test
-    fun encodePaymentRequest() {
-        // WHEN
-        val request = createRequest(EntityType.PAYMENT_REQUEST)
-        val response = rest.postForEntity(url, request, EncodeQRCodeResponse::class.java)
-
-        // THEN
-        assertEquals(200, response.statusCodeValue)
-
-        assertEquals("payment_request,7777,1300", response.body?.token)
+        assertEquals(
+            "cHJvZHVjdCw3Nzc3LDMwODc5MDEwMDA=.MTAw.NTFhNDJhNTI3ODhiODllMWI5YTM0MWI1NzY3OTVhNzU=",
+            response.body?.token
+        )
     }
 
     private fun createRequest(type: EntityType) = EncodeQRCodeRequest(

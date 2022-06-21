@@ -5,19 +5,23 @@ import com.wutsi.platform.core.error.Parameter
 import com.wutsi.platform.core.error.ParameterType
 import com.wutsi.platform.core.error.exception.BadRequestException
 import com.wutsi.platform.core.error.exception.ConflictException
+import com.wutsi.platform.core.error.exception.ForbiddenException
 import com.wutsi.platform.core.logging.KVLogger
+import com.wutsi.platform.qr.dao.KeyRepository
 import com.wutsi.platform.qr.dto.DecodeQRCodeRequest
 import com.wutsi.platform.qr.dto.DecodeQRCodeResponse
 import com.wutsi.platform.qr.dto.Entity
 import com.wutsi.platform.qr.error.ErrorURN
 import org.springframework.stereotype.Service
 import java.time.Clock
+import java.util.Base64
 
 @Service
 class DecodeDelegate(
     private val clock: Clock,
-    private val logger: KVLogger
-) {
+    private val logger: KVLogger,
+    private val dao: KeyRepository,
+) : AbstractDelegate() {
     fun invoke(request: DecodeQRCodeRequest): DecodeQRCodeResponse {
         logger.add("token", request.token)
 
@@ -30,7 +34,19 @@ class DecodeDelegate(
                 )
             )
 
-        val parts = request.token.split(',')
+        // Decode
+        val items = request.token.split(".")
+        if (items.size != 3)
+            throw malformedTokenException(request)
+
+        val decoder = Base64.getDecoder()
+        val token = String(decoder.decode(items[0]))
+        val keyId = String(decoder.decode(items[1]))
+        val signature = String(decoder.decode(items[2]))
+        verify(token, keyId, signature)
+
+        // Parts
+        val parts = token.split(',')
         if (parts.size != 3)
             throw malformedTokenException(request)
 
@@ -79,4 +95,23 @@ class DecodeDelegate(
                 )
             )
         )
+
+    private fun verify(token: String, keyId: String, signature: String) {
+        val key = dao.findById(keyId.toLong())
+            .orElseThrow {
+                throw ForbiddenException(
+                    error = Error(
+                        code = ErrorURN.SECRET_KEY_NOT_FOUND.urn
+                    )
+                )
+            }
+
+        val xsignature = sign(token, key)
+        if (signature != xsignature)
+            throw BadRequestException(
+                error = Error(
+                    code = ErrorURN.CORRUPTED_TOKEN.urn
+                )
+            )
+    }
 }
