@@ -2,16 +2,17 @@ package com.wutsi.platform.qr
 
 import com.wutsi.platform.core.WutsiApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.scheduling.`annotation`.EnableAsync
-import org.springframework.scheduling.`annotation`.EnableScheduling
-import kotlin.String
+import org.springframework.scheduling.annotation.EnableAsync
+import org.springframework.scheduling.annotation.EnableScheduling
+import org.springframework.transaction.annotation.EnableTransactionManagement
 
 @WutsiApplication
 @SpringBootApplication
 @EnableAsync
 @EnableScheduling
-public class Application
+@EnableTransactionManagement
+class Application
 
-public fun main(vararg args: String) {
+fun main(vararg args: String) {
     org.springframework.boot.runApplication<Application>(*args)
 }
