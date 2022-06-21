@@ -26,10 +26,10 @@
 
     <javax-validation.version>2.0.1.Final</javax-validation.version>
     <junit.version>5.8.2</junit.version>
-    <kotlin.version>1.6.21</kotlin.version>
+    <kotlin.version>1.7.0</kotlin.version>
     <kotlin-mockito.version>2.2.0</kotlin-mockito.version>
     <klint.version>0.46.0</klint.version>
-    <qrcode-kotlin.version>2.0.1</qrcode-kotlin.version>
+    <qrcode-kotlin.version>3.1.0</qrcode-kotlin.version>
     <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
     <hikari-cp.version>5.0.1</hikari-cp.version>
     <postgresql.version>42.4.0</postgresql.version>
@@ -53,7 +53,7 @@
 
     <dependency>
       <groupId>io.github.g0dkar</groupId>
-      <artifactId>qrcode-kotlin</artifactId>
+      <artifactId>qrcode-kotlin-jvm</artifactId>
       <version>${qrcode-kotlin.version}</version>
     </dependency>
 
