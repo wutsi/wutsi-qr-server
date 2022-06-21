@@ -2,5 +2,5 @@ wutsi:
   client-id: wutsi-qr
   platform:
     security:
-      type: jwt
+      api-key: ${API_KEY}
 
