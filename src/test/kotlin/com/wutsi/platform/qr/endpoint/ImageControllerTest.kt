@@ -31,7 +31,6 @@ internal class ImageControllerTest : AbstractSecuredController() {
         }
     }
 
-
     @Test
     fun fetchWithLogo() {
         // WHEN
