@@ -3,7 +3,6 @@ package com.wutsi.platform.qr.endpoint
 import com.wutsi.platform.core.error.exception.BadRequestException
 import com.wutsi.platform.core.error.exception.ConflictException
 import com.wutsi.platform.core.logging.KVLogger
-import com.wutsi.platform.core.tracing.TracingContext
 import com.wutsi.platform.qr.delegate.DecodeDelegate
 import com.wutsi.platform.qr.dto.DecodeQRCodeRequest
 import io.github.g0dkar.qrcode.QRCode
@@ -12,6 +11,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
@@ -23,10 +23,12 @@ import javax.imageio.ImageIO
 class ImageController(
     private val decoder: DecodeDelegate,
     private val logger: KVLogger,
-    private val tracingContext: TracingContext,
 ) {
     @GetMapping("/image/{token}.png")
-    fun invoke(@PathVariable token: String): ResponseEntity<ByteArray> {
+    fun invoke(
+        @PathVariable token: String,
+        @RequestParam(name = "tenant-id", required = false) tenantId: String? = null
+    ): ResponseEntity<ByteArray> {
         logger.add("token", token)
         try {
             decoder.invoke(DecodeQRCodeRequest(token)).entity
@@ -38,7 +40,7 @@ class ImageController(
                 .writeImage(qrcode)
 
             // Logo
-            val logo = getLogo()
+            val logo = tenantId?.let { getLogo(it) }
 
             // Merge
             val combined = combine(ImageIO.read(ByteArrayInputStream(qrcode.toByteArray())), logo)
@@ -58,10 +60,7 @@ class ImageController(
         }
     }
 
-    private fun getLogo(): BufferedImage? {
-        val tenantId = tracingContext.tenantId()
-            ?: return null
-
+    private fun getLogo(tenantId: String): BufferedImage? {
         val input = ImageController::class.java.getResourceAsStream("/logos/$tenantId.png")
             ?: return null
 
