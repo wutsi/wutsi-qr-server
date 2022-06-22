@@ -72,31 +72,46 @@ class DecodeControllerTest : AbstractSecuredController() {
     @Test
     fun malformed() {
         val request = DecodeQRCodeRequest(
-            token = "account,1111,2000000_xxx"
+            token = "YWNjb3VudCw3Nzc3LDMwODc5MDEwMDA=.MTAw"
         )
         val ex = assertThrows<HttpClientErrorException> {
             rest.postForEntity(url, request, DecodeQRCodeResponse::class.java)
         }
 
-        assertEquals(400, ex.rawStatusCode)
+        assertEquals(409, ex.rawStatusCode)
 
         val response = ObjectMapper().readValue(ex.responseBodyAsString, ErrorResponse::class.java)
         assertEquals(ErrorURN.MALFORMED_TOKEN.urn, response.error.code)
     }
 
     @Test
-    fun invalidExpiryDate() {
+    fun badSignature() {
         val request = DecodeQRCodeRequest(
-            token = "account,1111,xxx"
+            token = "YWNjb3VudCw3Nzc3LDMwODc5MDEwMDA=.MTAw.YjQ2OWY2YWM0MWNjNzFhNmZmMjlkMjYwZDZiYjMxxDA="
         )
         val ex = assertThrows<HttpClientErrorException> {
             rest.postForEntity(url, request, DecodeQRCodeResponse::class.java)
         }
 
-        assertEquals(400, ex.rawStatusCode)
+        assertEquals(409, ex.rawStatusCode)
 
         val response = ObjectMapper().readValue(ex.responseBodyAsString, ErrorResponse::class.java)
-        assertEquals(ErrorURN.MALFORMED_TOKEN.urn, response.error.code)
+        assertEquals(ErrorURN.CORRUPTED_TOKEN.urn, response.error.code)
+    }
+
+    @Test
+    fun badKey() {
+        val request = DecodeQRCodeRequest(
+            token = "YWNjb3VudCw3Nzc3LDMwODc5MDEwMDA=.MQ==.YjQ2OWY2YWM0MWNjNzFhNmZmMjlkMjYwZDZiYjMxNDA="
+        )
+        val ex = assertThrows<HttpClientErrorException> {
+            rest.postForEntity(url, request, DecodeQRCodeResponse::class.java)
+        }
+
+        assertEquals(409, ex.rawStatusCode)
+
+        val response = ObjectMapper().readValue(ex.responseBodyAsString, ErrorResponse::class.java)
+        assertEquals(ErrorURN.SECRET_KEY_NOT_FOUND.urn, response.error.code)
     }
 
 //    @Test

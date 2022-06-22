@@ -3,9 +3,7 @@ package com.wutsi.platform.qr.`delegate`
 import com.wutsi.platform.core.error.Error
 import com.wutsi.platform.core.error.Parameter
 import com.wutsi.platform.core.error.ParameterType
-import com.wutsi.platform.core.error.exception.BadRequestException
 import com.wutsi.platform.core.error.exception.ConflictException
-import com.wutsi.platform.core.error.exception.ForbiddenException
 import com.wutsi.platform.core.logging.KVLogger
 import com.wutsi.platform.qr.dao.KeyRepository
 import com.wutsi.platform.qr.dto.DecodeQRCodeRequest
@@ -53,36 +51,32 @@ class DecodeDelegate(
         if (parts.size != 3)
             throw malformedTokenException(request)
 
-        try {
-            val expires = parts[2].toLong()
-            if (expires < clock.millis() / 1000)
-                throw expiredException(request)
+        val expires = parts[2].toLong()
+        if (expires < clock.millis() / 1000)
+            throw expiredException(request)
 
-            val entity = Entity(
-                type = parts[0],
-                id = parts[1],
-                expires = expires
-            )
+        val entity = Entity(
+            type = parts[0],
+            id = parts[1],
+            expires = expires
+        )
 
-            logger.add("entity_id", entity.id)
-            logger.add("entity_type", entity.type)
-            logger.add("entity_expires", entity.expires)
-            return DecodeQRCodeResponse(
-                entity = entity
-            )
-        } catch (ex: NumberFormatException) {
-            throw malformedTokenException(request)
-        }
+        logger.add("entity_id", entity.id)
+        logger.add("entity_type", entity.type)
+        logger.add("entity_expires", entity.expires)
+        return DecodeQRCodeResponse(
+            entity = entity
+        )
     }
 
     private fun malformedTokenException(request: DecodeQRCodeRequest): Exception =
-        BadRequestException(
+        ConflictException(
             error = Error(
                 code = ErrorURN.MALFORMED_TOKEN.urn,
                 parameter = Parameter(
                     name = "token",
                     value = request.token,
-                    type = ParameterType.PARAMETER_TYPE_PAYLOAD
+                    type = ParameterType.PARAMETER_TYPE_PATH
                 )
             )
         )
@@ -102,7 +96,7 @@ class DecodeDelegate(
     private fun verify(token: String, keyId: String, signature: String) {
         val key = dao.findById(keyId.toLong())
             .orElseThrow {
-                throw ForbiddenException(
+                throw ConflictException(
                     error = Error(
                         code = ErrorURN.SECRET_KEY_NOT_FOUND.urn
                     )
@@ -111,9 +105,14 @@ class DecodeDelegate(
 
         val xsignature = sign(token, key)
         if (signature != xsignature)
-            throw BadRequestException(
+            throw ConflictException(
                 error = Error(
-                    code = ErrorURN.CORRUPTED_TOKEN.urn
+                    code = ErrorURN.CORRUPTED_TOKEN.urn,
+                    parameter = Parameter(
+                        name = "token",
+                        value = token,
+                        type = ParameterType.PARAMETER_TYPE_PATH
+                    )
                 )
             )
     }

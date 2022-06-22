@@ -19,7 +19,6 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
-
 @RestController
 class ImageController(
     private val decoder: DecodeDelegate,
@@ -46,7 +45,7 @@ class ImageController(
             val output = ByteArrayOutputStream()
             ImageIO.write(combined, "png", output)
 
-//            val resource = ByteArrayResource(output.toByteArray(), MediaType.IMAGE_PNG_VALUE)
+            // Result
             return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_PNG)
                 .body(output.toByteArray())
@@ -61,7 +60,7 @@ class ImageController(
 
     private fun getLogo(): BufferedImage? {
         val tenantId = tracingContext.tenantId()
-            ?: "1" //return null
+            ?: return null
 
         val input = ImageController::class.java.getResourceAsStream("/logos/$tenantId.png")
             ?: return null
