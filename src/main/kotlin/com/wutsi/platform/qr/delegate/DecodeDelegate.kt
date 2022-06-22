@@ -43,6 +43,9 @@ class DecodeDelegate(
         val token = String(decoder.decode(items[0]))
         val keyId = String(decoder.decode(items[1]))
         val signature = String(decoder.decode(items[2]))
+        logger.add("token", token)
+        logger.add("key_id", keyId)
+        logger.add("signature", signature)
         verify(token, keyId, signature)
 
         // Parts
