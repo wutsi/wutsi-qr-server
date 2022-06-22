@@ -21,7 +21,7 @@ class DecodeDelegate(
     private val dao: KeyRepository,
 ) : AbstractDelegate() {
     fun invoke(request: DecodeQRCodeRequest): DecodeQRCodeResponse {
-        logger.add("token", request.token)
+        logger.add("request_token", request.token)
 
         if (request.token.startsWith("http://") || request.token.startsWith("https://"))
             return DecodeQRCodeResponse(
