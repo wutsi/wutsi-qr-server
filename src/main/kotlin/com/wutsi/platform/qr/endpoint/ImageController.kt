@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -76,7 +77,13 @@ class ImageController(
         val combined = BufferedImage(qrcode.width, qrcode.height, BufferedImage.TYPE_INT_ARGB)
         val g2 = combined.graphics as Graphics2D
         g2.drawImage(qrcode, 0, 0, null)
-//        g2.composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.0f)
+        g2.background = Color.WHITE
+        g2.fillOval(
+            Math.round((deltaWidth / 2).toFloat()),
+            Math.round((deltaHeight / 2).toFloat()),
+            logo.width,
+            logo.height
+        )
         g2.drawImage(
             logo,
             Math.round((deltaWidth / 2).toFloat()),
